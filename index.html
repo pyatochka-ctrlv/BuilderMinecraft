@@ -800,12 +800,18 @@ window.addEventListener('resize', () => closeEmoji(false));
 const frame = $('#preview');
 const pvWrap = $('#pvWrap');
 let frameReady = false;
-frame.srcdoc = '<!doctype html><html lang="uk"><head><meta charset="utf-8"><style>html,body{margin:0;background:#fff}#page{width:770px;padding:32px 0 36px;min-height:240px;display:flow-root}.gap{width:680px;margin:0 auto 24px;border:1.5px dashed #C9D2DC;border-radius:10px;padding:7px 12px;font:13px/1.4 system-ui,sans-serif;color:#8A96A3;text-align:center}.empty{width:680px;margin:60px auto;text-align:center;font:15px system-ui,sans-serif;color:#8A96A3}</style><style id="st"></style></head><body><div id="page"></div></body></html>';
+frame.srcdoc = '<!doctype html><html lang="uk"><head><meta charset="utf-8"><style>html,body{margin:0;background:#fff}#page{width:770px;padding:32px 0 36px;min-height:240px;display:flow-root}.gap{width:680px;margin:0 auto 24px;border:1.5px dashed #C9D2DC;border-radius:10px;padding:7px 12px;font:13px/1.4 system-ui,sans-serif;color:#8A96A3;text-align:center}.empty{width:680px;margin:60px auto;text-align:center;font:15px system-ui,sans-serif;color:#8A96A3}.pv-item{position:relative}.pv-item::after{content:"";position:absolute;inset:-6px 39px;border:2px dashed transparent;border-radius:14px;pointer-events:none}.pv-item:hover::after,.pv-item:has(:focus-visible)::after{border-color:#FF8A00}.pv-copy{position:absolute;z-index:2;top:8px;right:53px;display:flex;gap:4px;opacity:.6;transition:opacity .15s}.pv-item:hover .pv-copy,.pv-copy:has(:focus-visible){opacity:1}.pv-copy button{font:600 12px/1 system-ui,sans-serif;color:#1F2A37;background:rgba(255,255,255,.94);border:1px solid #C9D2DC;border-radius:7px;padding:6px 9px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.15)}.pv-copy button:hover{background:#FF8A00;border-color:#FF8A00;color:#1F1300}.pv-copy button:focus-visible{outline:3px solid #2F7DF6;outline-offset:1px}@media (hover:none){.pv-copy{opacity:1}}</style><style id="st"></style></head><body><div id="page"></div></body></html>';
 frame.addEventListener('load', () => {
   frameReady = true;
   const w = frame.contentWindow;
   try { new w.ResizeObserver(fitFrame).observe(w.document.body); } catch (_) {}
   try { w.document.fonts.ready.then(fitFrame); } catch (_) {}
+  w.document.addEventListener('click', e => {
+    const b = e.target.closest('[data-copy]');
+    if (!b) return;
+    const o = lastOuts.find(x => x.el.id === b.closest('.pv-item').dataset.id);
+    if (o) copyText(b.dataset.copy === 'html' ? o.html : o.css, w);
+  });
   update();
 });
 function fitFrame() {
@@ -825,7 +831,7 @@ function renderPreview(outs) {
   const used = [...new Set(outs.map(o => o.el.type))];
   doc.getElementById('st').textContent = used.map(t => CSS[t]).join('\n');
   doc.getElementById('page').innerHTML = outs.length
-    ? outs.map(o => o.html).join('<div class="gap">тут можна написати звичайний текст у білдері</div>')
+    ? outs.map((o, i) => `<div class="pv-item" data-id="${o.el.id}"><div class="pv-copy"><button type="button" data-copy="html" aria-label="Копіювати HTML вставки ${i + 1}" title="Копіювати HTML">⧉ HTML</button><button type="button" data-copy="css" aria-label="Копіювати CSS вставки ${i + 1}" title="Копіювати CSS">⧉ CSS</button></div>${o.html}</div>`).join('<div class="gap">тут можна написати звичайний текст у білдері</div>')
     : '<div class="empty">Тут з’явиться перегляд уроку</div>';
   fitFrame();
 }
@@ -862,14 +868,16 @@ codeList.addEventListener('click', e => {
   if (o) copyText(b.dataset.copy === 'html' ? o.html : o.css);
 });
 
-async function copyText(text) {
+// win — вікно, де стався клік (сторінка або iframe перегляду): там є активація користувача й фокус.
+async function copyText(text, win = window) {
   let ok = false;
-  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); ok = true; } } catch (_) {}
+  try { if (win.navigator.clipboard && win.isSecureContext) { await win.navigator.clipboard.writeText(text); ok = true; } } catch (_) {}
   if (!ok) {
-    const ta = document.createElement('textarea');
+    const d = win.document;
+    const ta = d.createElement('textarea');
     ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0';
-    document.body.appendChild(ta); ta.select();
-    try { ok = document.execCommand('copy'); } catch (_) {}
+    d.body.appendChild(ta); ta.select();
+    try { ok = d.execCommand('copy'); } catch (_) {}
     ta.remove();
   }
   toast(ok ? 'Скопійовано' : 'Не вдалося скопіювати — відкрий «Показати код» і скопіюй вручну');
