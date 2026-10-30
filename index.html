@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Генератор вставок Minecraft Kids</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+:root{
+  --bar:#1F2A37;--bar-fg:#F3F6F9;--bg:#E9EDF1;--card:#fff;--card-2:#F6F8FA;--fg:#1E2A36;--muted:#5B6773;
+  --line:#D5DCE3;--input:#fff;--accent:#FF8A00;--accent-fg:#1F1300;--accent-h:#FF9E2C;
+  --focus:#2F7DF6;--ok:#2E8B3E;--warn-bg:#FFF4D6;--warn-fg:#7A5200;--err-bg:#FDE7E8;--err-fg:#A3171D;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bar:#111821;--bar-fg:#E8EDF2;--bg:#18212B;--card:#222D39;--card-2:#1C2631;--fg:#E5EAF0;--muted:#9AA7B4;
+    --line:#354352;--input:#1A232D;--accent:#FF8A00;--accent-fg:#1F1300;--accent-h:#FFA040;
+    --focus:#6AA6FF;--ok:#6FCF7F;--warn-bg:#3A3015;--warn-fg:#F5D27A;--err-bg:#3D1C1F;--err-fg:#FF9EA2;
+    --shadow:0 1px 2px rgba(0,0,0,.3);color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bar:#111821;--bar-fg:#E8EDF2;--bg:#18212B;--card:#222D39;--card-2:#1C2631;--fg:#E5EAF0;--muted:#9AA7B4;
+  --line:#354352;--input:#1A232D;--accent:#FF8A00;--accent-fg:#1F1300;--accent-h:#FFA040;
+  --focus:#6AA6FF;--ok:#6FCF7F;--warn-bg:#3A3015;--warn-fg:#F5D27A;--err-bg:#3D1C1F;--err-fg:#FF9EA2;
+  --shadow:0 1px 2px rgba(0,0,0,.3);color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.45 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.topbar{position:sticky;top:0;z-index:20;background:var(--bar);color:var(--bar-fg);display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 16px}
+.topbar h1{font-size:17px;margin:0 auto 0 0;font-weight:600;display:flex;align-items:center;gap:8px}
+.topbar h1 .logo{width:22px;height:22px;border-radius:4px;background:linear-gradient(#64B43F 0 40%,#8B5A34 40%);box-shadow:inset -3px -3px 0 rgba(0,0,0,.2)}
+.topbar .tb-btn{background:transparent;border:1px solid rgba(255,255,255,.28);color:var(--bar-fg);border-radius:8px;padding:6px 12px;cursor:pointer}
+.topbar .tb-btn:hover{background:rgba(255,255,255,.1)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:16px;max-width:1720px;margin:0 auto}
+@media (min-width:1180px){.layout{grid-template-columns:minmax(420px,1fr) minmax(0,830px)}.col-right{position:sticky;top:64px;max-height:calc(100vh - 80px);overflow:auto}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+.panel h2{font-size:16px;margin:0 0 10px;font-weight:600}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.btn{border:1px solid var(--line);background:var(--card-2);border-radius:8px;padding:7px 12px;cursor:pointer;min-height:36px}
+.btn:hover{border-color:var(--muted)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg);font-weight:600}
+.btn-primary:hover{background:var(--accent-h);border-color:var(--accent-h)}
+.btn-sm{padding:3px 9px;min-height:30px;font-size:13px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+textarea,input[type=text],input[type=number],select{width:100%;background:var(--input);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+textarea{resize:vertical;min-height:64px}
+#source{min-height:220px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px}
+details.help{margin-top:10px}
+details.help summary{cursor:pointer;color:var(--muted);font-size:14px}
+.help-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+.help-table td{border-top:1px solid var(--line);padding:5px 6px;vertical-align:top}
+.help-table code{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;white-space:nowrap}
+.unrec{margin-top:10px;background:var(--warn-bg);color:var(--warn-fg);border-radius:8px;padding:10px 12px;font-size:13px}
+.unrec ol{margin:6px 0 0;padding-left:20px}
+.unrec li{word-break:break-word}
+.parsed-ok{margin-top:10px;color:var(--ok);font-size:14px}
+.add-row{display:flex;gap:8px;flex-wrap:wrap}
+.add-row select{flex:1 1 200px;width:auto}
+.empty-list{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:12px}
+.card-h{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px 8px 14px;border-bottom:1px solid var(--line);background:var(--card-2);border-radius:12px 12px 0 0}
+.card-h .ttl{font-weight:600;margin-right:auto}
+.card-h .num{display:inline-block;min-width:24px;text-align:center;font-size:12px;background:var(--bar);color:var(--bar-fg);border-radius:6px;padding:1px 6px;margin-right:6px}
+.icon-btn{border:1px solid var(--line);background:var(--card);border-radius:7px;min-width:32px;height:32px;padding:0 8px;cursor:pointer;font-size:13px}
+.icon-btn:hover{border-color:var(--muted)}
+.icon-btn.danger:hover{border-color:#D33;color:#D33}
+.icon-btn:disabled{opacity:.4;cursor:default}
+.card-b{padding:12px 14px;display:grid;gap:10px}
+.f{display:grid;gap:4px}
+.f>span,.f>.lbl{font-size:13px;color:var(--muted);font-weight:500}
+.f-inline{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:end}
+.emo-btn{width:48px;height:40px;font-size:22px;line-height:1;border:1px solid var(--line);border-radius:8px;background:var(--input);cursor:pointer}
+.emo-btn:hover{border-color:var(--muted)}
+.swatches{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sw{width:30px;height:30px;border-radius:6px;border:2px solid transparent;cursor:pointer;box-shadow:inset -3px -3px 0 rgba(0,0,0,.2);padding:0}
+.sw[aria-pressed="true"]{border-color:var(--fg);outline:2px solid var(--card);outline-offset:-4px}
+input[type=color]{width:42px;height:32px;border:1px solid var(--line);border-radius:6px;background:var(--input);padding:2px;cursor:pointer}
+.inherit-note{font-size:12.5px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg label{display:flex;align-items:center;gap:6px;padding:6px 12px;cursor:pointer;border-right:1px solid var(--line)}
+.seg label:last-child{border-right:0}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label:has(input:checked){background:var(--accent);color:var(--accent-fg);font-weight:600}
+.seg label:has(input:focus-visible){outline:3px solid var(--focus);outline-offset:-3px}
+.hw-cards{display:grid;gap:8px}
+.hw-card{border:1px solid var(--line);border-radius:8px;padding:8px;display:grid;gap:6px;background:var(--card-2)}
+.hw-card .stars{font-size:13px}
+.sep-colors{display:flex;gap:8px;flex-wrap:wrap}
+/* preview */
+.pv-wrap{position:relative;width:100%;overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:10px;padding:0}
+#preview{display:block;width:770px;border:0;background:#fff;transform-origin:0 0;height:300px}
+.code-list{margin-top:14px}
+.total{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding:10px 12px;border-radius:10px;background:var(--card-2);border:1px solid var(--line);margin-bottom:12px;font-size:14px}
+.cnt{font-variant-numeric:tabular-nums;font-size:13px;padding:2px 8px;border-radius:999px;background:var(--card-2);border:1px solid var(--line);white-space:nowrap}
+.cnt.is-warn{background:var(--warn-bg);color:var(--warn-fg);border-color:transparent}
+.cnt.is-err{background:var(--err-bg);color:var(--err-fg);border-color:transparent;font-weight:600}
+.msg-err{background:var(--err-bg);color:var(--err-fg);border-radius:8px;padding:8px 10px;font-size:13px;margin-top:8px}
+.ins{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;background:var(--card)}
+.ins-h{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-bottom:8px}
+.ins-h b{margin-right:auto}
+.ins details summary{cursor:pointer;font-size:13px;color:var(--muted);margin-top:8px}
+.ins pre{margin:6px 0 10px;background:var(--card-2);border:1px solid var(--line);border-radius:8px;padding:8px;font:12px/1.45 "IBM Plex Mono",ui-monospace,monospace;white-space:pre-wrap;word-break:break-all;max-height:220px;overflow:auto}
+.ins .lbl{font-size:12px;color:var(--muted)}
+/* emoji popover */
+.emo-pop{position:absolute;z-index:50;width:min(340px,calc(100vw - 24px));background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:10px}
+.emo-pop h3{font-size:12px;color:var(--muted);margin:6px 0 4px;font-weight:600}
+.emo-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px}
+.emo-grid button{font-size:22px;line-height:1;height:36px;border:0;background:transparent;border-radius:6px;cursor:pointer;padding:0}
+.emo-grid button:hover{background:var(--card-2)}
+.emo-custom{display:flex;gap:6px;margin-top:10px}
+.emo-custom input{flex:1}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--bar);color:var(--bar-fg);padding:9px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.2s;z-index:60;font-size:14px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:520px){.topbar{position:static}.layout{padding:12px 16px}.panel{padding:12px}.topbar h1{font-size:15px;width:100%}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <h1><span class="logo" aria-hidden="true"></span>Генератор вставок · Minecraft Kids</h1>
+  <button type="button" class="tb-btn" id="btnNew">Новий урок</button>
+  <button type="button" class="tb-btn" id="btnExport">Експорт JSON</button>
+  <button type="button" class="tb-btn" id="btnImport">Імпорт JSON</button>
+  <input type="file" id="fileImport" accept="application/json,.json" hidden>
+</header>
+
+<main class="layout">
+  <div class="col-left">
+    <section class="panel" aria-labelledby="qfTitle">
+      <h2 id="qfTitle">Швидке заповнення з тексту</h2>
+      <label for="source" class="visually-hidden">Встав текст уроку</label>
+      <textarea id="source" placeholder="Встав текст уроку з мітками #урок:, #назва:, #легенда: …" spellcheck="false"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button type="button" class="btn btn-primary" id="btnParse">Розкласти по шаблону</button>
+        <button type="button" class="btn" id="btnSample">Вставити приклад</button>
+      </div>
+      <div id="parseResult" aria-live="polite"></div>
+      <details class="help">
+        <summary>Довідка: усі мітки</summary>
+        <table class="help-table">
+          <tbody>
+            <tr><td><code>#урок: 1</code></td><td>Номер уроку (Шапка)</td></tr>
+            <tr><td><code>#сюжет: 🏰 Академія пригод</code></td><td>Сюжет / розділ (Шапка). Колір підбирається за назвою розділу</td></tr>
+            <tr><td><code>#назва: …</code></td><td>Назва уроку (Шапка)</td></tr>
+            <tr><td><code>#підзаголовок: …</code></td><td>Підзаголовок (Шапка, необов’язково)</td></tr>
+            <tr><td><code>#легенда:</code></td><td>Далі — абзаци, по одному на рядок</td></tr>
+            <tr><td><code>#цілі:</code></td><td>Далі — пункти <code>- …</code></td></tr>
+            <tr><td><code>#заголовок: 🎬 Назва | підзаголовок</code></td><td>Заголовок блоку</td></tr>
+            <tr><td><code>#розділювач</code></td><td>Розділювач «кубики»</td></tr>
+            <tr><td><code>#смуга</code></td><td>Розділювач «смуга землі»</td></tr>
+            <tr><td><code>#порада: …</code></td><td>Підказка 💡</td></tr>
+            <tr><td><code>#увага: …</code></td><td>Увага ⚠️</td></tr>
+            <tr><td><code>#перевір: …</code></td><td>Перевір себе ✅</td></tr>
+            <tr><td><code>#місія: Назва</code></td><td>Далі — кроки <code>- …</code></td></tr>
+            <tr><td><code>#дз:</code></td><td>Три рядки <code>- Назва | текст</code> (⭐, ⭐⭐, ⭐⭐⭐)</td></tr>
+            <tr><td><code>#англійська:</code></td><td>До 8 рядків <code>- word — переклад</code></td></tr>
+            <tr><td><code>#артефакт: 🎒 Назва | текст</code></td><td>Артефакт уроку</td></tr>
+            <tr><td><code>#наступний: 2 | Назва | тизер</code></td><td>Наступний урок</td></tr>
+          </tbody>
+        </table>
+        <p class="muted small">Регістр міток не важливий, двокрапка обов’язкова. <code>**текст**</code> стає жирним. Кожна мітка створює новий елемент, тому їх може бути кілька.</p>
+      </details>
+    </section>
+
+    <section aria-labelledby="listTitle">
+      <div class="row" style="justify-content:space-between;margin:0 2px 8px">
+        <h2 id="listTitle" style="font-size:16px;margin:0">Елементи уроку</h2>
+        <span class="muted small" id="listCount"></span>
+      </div>
+      <div id="cards"></div>
+      <div class="panel add-row">
+        <label for="addType" class="visually-hidden">Тип елемента</label>
+        <select id="addType"></select>
+        <button type="button" class="btn btn-primary" id="btnAdd">+ Додати елемент</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="col-right">
+    <section class="panel" aria-labelledby="pvTitle">
+      <h2 id="pvTitle">Перегляд</h2>
+      <div class="pv-wrap" id="pvWrap"><iframe id="preview" title="Перегляд уроку"></iframe></div>
+      <div class="code-list" id="codeList"></div>
+    </section>
+  </div>
+</main>
+
+<div class="emo-pop" id="emoPop" role="dialog" aria-label="Вибір емодзі" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+
+/* ---------- Дані ---------- */
+const STORAGE_KEY = 'mk-lesson-generator';
+const HTML_LIMIT = 10000;
+const TOTAL_LIMIT = 20000;
+const DEFAULT_COLOR = '#5FA83A';
+
+const SECTIONS = [
+  { n: 1, name: 'Академія пригод', color: '#5FA83A', emoji: '🏰' },
+  { n: 2, name: 'Магія змін', color: '#8E6CFF', emoji: '🔮' },
+  { n: 3, name: 'Редстоун', color: '#E5484D', emoji: '⚡' },
+  { n: 4, name: 'NPC і масиви', color: '#F59F00', emoji: '🤖' },
+  { n: 5, name: 'Неіснуючий Minecraft', color: '#12A4B6', emoji: '🌀' },
+  { n: 6, name: 'Архітектура', color: '#3B6FD8', emoji: '🏛️' }
+];
+
+const EMOJI_GROUPS = [
+  ['Будівництво', ['🧱', '🏰', '🏠', '🏗️', '⛏️', '🪓', '🪵', '🪨']],
+  ['Магія', ['✨', '🔮', '🧙', '🪄', '📜', '🗝️', '🧪', '⚗️']],
+  ['Техніка', ['🤖', '⚡', '🔧', '⚙️', '💡', '🔌', '🚀', '🛰️']],
+  ['Природа', ['🌳', '🌊', '🔥', '🌋', '🐝', '🐟', '🐴', '🌸']],
+  ['Навчання', ['🎯', '📚', '✏️', '🧠', '🎬', '▶️', '🏆', '⭐']],
+  ['Інше', ['🎒', '🗺️', '🧭', '🎪', '🌀', '🏛️', '🎨', '🔤']]
+];
+
+const NOTE_VARIANTS = {
+  tip: { label: 'Порада', emoji: '💡', title: 'Порада' },
+  warn: { label: 'Увага', emoji: '⚠️', title: 'Увага' },
+  ok: { label: 'Готово', emoji: '✅', title: 'Перевір себе' }
+};
+
+const SEP_COLORS = ['#5FA83A', '#8B5A34', '#7C8288', '#FFD23F', '#4FD1E8'];
+const HW_STARS = ['⭐', '⭐⭐', '⭐⭐⭐'];
+
+const SAMPLE = `#урок: 1
+#сюжет: Академія пригод
+#назва: Перші кроки у світі пригод Minecraft
+#підзаголовок: Вітаємо тебе у світі Minecraft!
+#легенда:
+Сьогодні ти не просто гравець — ти новий учень чи учениця Академії… **І саме ти зможеш її відновити 👀**
+Твоє перше завдання — зробити перший крок у цьому світі.
+#цілі:
+- Налаштовувати та створювати власні світи.
+- Керувати персонажем та його інвентарем.
+#заголовок: 🎬 Презентація уроку | Гортай слайди разом із викладачем
+#розділювач
+#порада: Щось не виходить? Переглянь відео-підказку.
+#увага: Не натискай «Скинути редактор» — код зникне.
+#перевір: Твій табір має 4 стіни по 5 блоків.
+#місія: Збудуй стартовий табір
+- Створи плаский світ.
+- Виклади з блоків квадрат 5×5.
+#смуга
+#дз:
+- Дорога | Прокладай з блоків дорогу від табору.
+- Стіна з вікном | Збудуй стіну й залиш у ній вікно.
+- Будиночок | Збудуй будиночок із дверима й дахом.
+#англійська:
+- block — блок
+- world — світ
+#артефакт: 🎒 Мій перший інвентар | Тепер ти вмієш знаходити й брати потрібні блоки.
+#наступний: 2 | Мій суперпомічник — Агент на виклик | У тебе з’явиться робот, який будуватиме за тебе!`;
+
+/* ---------- CSS шаблонів (дослівно з шаблону LMS) ---------- */
+const CSS = {
+hero: `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
+.mk-hero{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1E2A36;text-align:left!important;white-space:normal;box-sizing:border-box;width:680px!important;max-width:none!important;margin:0 auto 24px!important;line-height:1.55;opacity:1!important}
+.mk-hero *{box-sizing:border-box;text-align:inherit!important}
+@media(max-width:760px){.mk-hero{width:calc(100vw - 40px)!important}}
+.mk-hero{border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#6EC1FF,#DFF3FF);text-align:center!important}
+.mk-hero__in{padding:34px 24px 26px}
+.mk-hero__pill{display:inline-block;background:#fff;color:#10304A;font-weight:700;font-size:13px;padding:5px 12px;border-radius:999px;margin:0 3px 8px}
+.mk-hero__pill--s{background:var(--c,#5FA83A);color:#fff}
+.mk-hero h1{margin:6px 0 10px!important;font-size:32px;line-height:1.15;font-weight:700;color:#10304A}
+.mk-hero .mk-hero__p{margin:0 auto!important;max-width:460px;font-size:17px;color:#1D4563}
+.mk-hero__px{height:34px;background:repeating-linear-gradient(90deg,#64B43F 0 14px,#559F33 14px 28px) 0 0/100% 12px no-repeat,repeating-linear-gradient(90deg,#8B5A34 0 14px,#77492A 14px 28px) 0 12px/100% 11px no-repeat,repeating-linear-gradient(90deg,#6B4423 0 14px,#5C3A1E 14px 28px) 0 23px/100% 11px no-repeat}
+@media(max-width:520px){.mk-hero h1{font-size:26px}}`,
+
+story: `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
+.mk-story{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1E2A36;text-align:left!important;white-space:normal;box-sizing:border-box;width:680px!important;max-width:none!important;margin:0 auto 24px!important;line-height:1.55;opacity:1!important}
+.mk-story *{box-sizing:border-box;text-align:inherit!important}
+@media(max-width:760px){.mk-story{width:calc(100vw - 40px)!important}}
+.mk-story{background:#F3EFFF;border-radius:20px;padding:24px}
+.mk-story__tag{display:inline-block;font-size:13px;font-weight:700;color:#6B4FD8;background:#fff;border-radius:999px;padding:4px 12px;margin-bottom:12px}
+.mk-story .mk-story__p{margin:0 0 10px!important;font-size:17px}
+.mk-story .mk-story__p:last-child{margin:0!important}
+.mk-story b{color:#5B3FD0}`,
+
+goals: `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
+.mk-goals{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1E2A36;text-align:left!important;white-space:normal;box-sizing:border-box;width:680px!important;max-width:none!important;margin:0 auto 24px!important;line-height:1.55;opacity:1!important}
+.mk-goals *{box-sizing:border-box;text-align:inherit!important}
+@media(max-width:760px){.mk-goals{width:calc(100vw - 40px)!important}}
+.mk-goals{background:#F4FBF0;border:2px solid #CDEBC0;border-radius:20px;padding:22px 24px}
+.mk-goals__t{font-weight:700;font-size:20px;margin:0 0 14px}
+.mk-goals .mk-goals__list{;margin:0;padding:0}
+.mk-goals .mk-goals__li{display:flex;gap:12px;align-items:flex-start;margin:0 0 10px;font-size:16px}
+.mk-goals .mk-goals__li:last-child{margin:0}
+.mk-goals .mk-goals__li::before{content:"";flex:none;width:26px;height:26px;border-radius:5px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.2 3L13 4.5' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat,#5FA83A;box-shadow:inset -3px -3px 0 rgba(0,0,0,.18)}`,
+
+h: `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
+.mk-h{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1E2A36;text-align:left!important;white-space:normal;box-sizing:border-box;width:680px!important;max-width:none!important;margin:28px auto 16px!important;line-height:1.55;opacity:1!important}
+.mk-h *{box-sizing:border-box;text-align:inherit!important}
+@media(max-width:760px){.mk-h{width:calc(100vw - 40px)!important}}
+.mk-h{display:flex;align-items:center;gap:14px}
+.mk-h__i{flex:none;width:48px;height:48px;border-radius:6px;background:var(--c,#5FA83A);font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:inset -4px -4px 0 rgba(0,0,0,.2),inset 4px 4px 0 rgba(255,255,255,.25)}
+.mk-h h2{margin:0!important;font-size:24px;line-height:1.2;font-weight:700;color:#1E2A36}
+.mk-h__i img{width:26px!important;height:26px!important;margin:0!important;vertical-align:0!important}
+.mk-h__s{font-size:14px;color:#5B6773;margin-top:2px}`,
+
+sep: `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
+.mk-sep{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1E2A36;text-align:left!important;white-space:normal;box-sizing:border-box;width:680px!important;max-width:none!important;margin:36px auto 36px!important;line-height:1.55;opacity:1!important}
+.mk-sep *{box-sizing:border-box;text-align:inherit!important}
+@media(max-width:760px){.mk-sep{width:calc(100vw - 40px)!important}}
+.mk-sep{display:flex;justify-content:center;gap:6px}
+.mk-sep span{display:block;font-size:0;line-height:0;width:16px;height:16px;border-radius:2px;background:var(--b);box-shadow:inset -3px -3px 0 rgba(0,0,0,.2),inset 3px 3px 0 rgba(255,255,255,.3)}`,
+
+strip: `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
+.mk-strip{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1E2A36;text-align:left!important;white-space:normal;box-sizing:border-box;width:680px!important;max-width:none!important;margin:36px auto 36px!important;line-height:1.55;opacity:1!important}
+.mk-strip *{box-sizing:border-box;text-align:inherit!important}
+@media(max-width:760px){.mk-strip{width:calc(100vw - 40px)!important}}
+.mk-strip{height:34px;border-radius:8px;background:repeating-linear-gradient(90deg,#64B43F 0 14px,#559F33 14px 28px) 0 0/100% 12px no-repeat,repeating-linear-gradient(90deg,#8B5A34 0 14px,#77492A 14px 28px) 0 12px/100% 11px no-repeat,repeating-linear-gradient(90deg,#6B4423 0 14px,#5C3A1E 14px 28px) 0 23px/100% 11px no-repeat}
+.mk-strip span{display:block;height:34px;font-size:0;line-height:0}`,
+
+note: `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
+.mk-note{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1E2A36;text-align:left!important;white-space:normal;box-sizing:border-box;width:680px!important;max-width:none!important;margin:0 auto 24px!important;line-height:1.55;opacity:1!important}
+.mk-note *{box-sizing:border-box;text-align:inherit!important}
+@media(max-width:760px){.mk-note{width:calc(100vw - 40px)!important}}
+.mk-note{display:flex;gap:14px;align-items:flex-start;border-radius:16px;padding:16px 18px;background:#EAF4FF;border-left:6px solid #3B82F6}
+.mk-note__i{flex:none;font-size:24px;line-height:1.25}
+.mk-note b{display:block;margin:0 0 2px;font-size:16px}
+.mk-note .mk-note__p{margin:0!important;font-size:15.5px}
+.mk-note--warn{background:#FFF3E3;border-color:#FF8A00}
+.mk-note--ok{background:#EEF8E8;border-color:#5FA83A}`,
+
+quest: `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
+.mk-quest{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1E2A36;text-align:left!important;white-space:normal;box-sizing:border-box;width:680px!important;max-width:none!important;margin:0 auto 24px!important;line-height:1.55;opacity:1!important}
+.mk-quest *{box-sizing:border-box;text-align:inherit!important}
+@media(max-width:760px){.mk-quest{width:calc(100vw - 40px)!important}}
+.mk-quest{background:linear-gradient(160deg,#1A2850,#3A2A78);color:#fff;border-radius:22px;padding:26px 24px}
+.mk-quest__tag{font-size:13px;font-weight:700;color:#FFD23F;margin-bottom:4px}
+.mk-quest h2{margin:0 0 16px!important;font-size:24px;line-height:1.2;color:#fff;font-weight:700}
+.mk-quest .mk-quest__list{;margin:0;padding:0;counter-reset:q}
+.mk-quest .mk-quest__li{counter-increment:q;display:flex;gap:12px;align-items:flex-start;margin:0 0 10px;font-size:16px}
+.mk-quest .mk-quest__li:last-child{margin:0}
+.mk-quest .mk-quest__li::before{content:counter(q);flex:none;width:30px;height:30px;border-radius:5px;background:#FFD23F;color:#1A2850;font-weight:700;text-align:center;line-height:30px}`,
+
+hw: `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
+.mk-hw{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1E2A36;text-align:left!important;white-space:normal;box-sizing:border-box;width:680px!important;max-width:none!important;margin:0 auto 24px!important;line-height:1.55;opacity:1!important}
+.mk-hw *{box-sizing:border-box;text-align:inherit!important}
+@media(max-width:760px){.mk-hw{width:calc(100vw - 40px)!important}}
+.mk-hw__t{font-weight:700;font-size:20px;margin:0 0 12px}
+.mk-hw__g{display:flex;flex-wrap:wrap;gap:10px}
+.mk-hw__c{flex:1 1 180px;border-radius:16px;padding:16px;background:#EEF8E8;border:2px solid #CDEBC0}
+.mk-hw__c:nth-child(2){background:#EAF4FF;border-color:#C7DEFA}
+.mk-hw__c:nth-child(3){background:#F3EFFF;border-color:#DDD3FF}
+.mk-hw__s{font-size:17px;margin-bottom:4px}
+.mk-hw__n{font-weight:700;font-size:16px;margin-bottom:2px}
+.mk-hw__c p{margin:0;font-size:14.5px;color:#46525E}`,
+
+words: `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
+.mk-words{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1E2A36;text-align:left!important;white-space:normal;box-sizing:border-box;width:680px!important;max-width:none!important;margin:0 auto 24px!important;line-height:1.55;opacity:1!important}
+.mk-words *{box-sizing:border-box;text-align:inherit!important}
+@media(max-width:760px){.mk-words{width:calc(100vw - 40px)!important}}
+.mk-words{background:#F2F6FF;border-radius:20px;padding:20px}
+.mk-words__t{font-weight:700;font-size:20px;margin:0 0 12px}
+.mk-words__g{display:flex;flex-wrap:wrap;gap:8px}
+.mk-words__w{flex:1 1 120px;background:#fff;border:2px solid #DCE6F7;border-radius:14px;padding:10px;text-align:center}
+.mk-words__en{font-weight:700;font-size:17px;color:#3B6FD8}
+.mk-words__ua{font-size:13.5px;color:#5B6773}`,
+
+art: `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
+.mk-art{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1E2A36;text-align:left!important;white-space:normal;box-sizing:border-box;width:680px!important;max-width:none!important;margin:0 auto 24px!important;line-height:1.55;opacity:1!important}
+.mk-art *{box-sizing:border-box;text-align:inherit!important}
+@media(max-width:760px){.mk-art{width:calc(100vw - 40px)!important}}
+.mk-art{display:flex;gap:16px;align-items:center;background:linear-gradient(135deg,#FFE27A,#FFF6D6);border:2px solid #FFD23F;border-radius:20px;padding:18px 20px}
+.mk-art__i{flex:none;width:64px;height:64px;border-radius:8px;background:#fff;font-size:34px;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:inset -4px -4px 0 rgba(0,0,0,.08)}
+.mk-art__i img{width:36px!important;height:36px!important;margin:0!important}
+.mk-art__k{font-size:13px;font-weight:700;color:#8A5A00}
+.mk-art__n{font-size:20px;font-weight:700;color:#5A3B00;line-height:1.25}
+.mk-art .mk-art__p{margin:4px 0 0!important;font-size:14.5px;color:#5A4520}`,
+
+next: `@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap');
+.mk-next{font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1E2A36;text-align:left!important;white-space:normal;box-sizing:border-box;width:680px!important;max-width:none!important;margin:0 auto 8px!important;line-height:1.55;opacity:1!important}
+.mk-next *{box-sizing:border-box;text-align:inherit!important}
+@media(max-width:760px){.mk-next{width:calc(100vw - 40px)!important}}
+.mk-next{display:flex;gap:14px;align-items:center;border:2px dashed #B9C4D0;border-radius:18px;padding:16px 18px}
+.mk-next__i{flex:none;font-size:30px;line-height:1}
+.mk-next__k{font-size:13px;font-weight:700;color:#5B6773}
+.mk-next__n{font-size:17px;font-weight:700}
+.mk-next .mk-next__p{margin:2px 0 0!important;font-size:14.5px;color:#46525E}`
+};
+
+/* ---------- Утиліти ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const flat = s => String(s ?? '').replace(/\s*[\r\n]+\s*/g, ' ').trim();
+// Екранування + **жирний**. Пробіл між двома <b> зберігаємо як &nbsp;, бо пробіли між тегами прибираються.
+const rich = s => esc(flat(s)).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/>\s+</g, '>&nbsp;<');
+const emo = s => esc(flat(s));
+const pair = (a, b) => [a, b].filter(Boolean).join(' ');
+const oneLine = h => h.replace(/[\r\n]+/g, '').replace(/>\s+</g, '><');
+const list = arr => (Array.isArray(arr) ? arr : []).map(flat).filter(Boolean);
+const safeColor = (c, def = DEFAULT_COLOR) => /^#[0-9a-f]{3,8}$/i.test(String(c || '').trim()) ? String(c).trim() : def;
+const clone = o => JSON.parse(JSON.stringify(o));
+const EMOJI_RE = /^(\p{Extended_Pictographic}(?:️|⃣|\p{Emoji_Modifier}|‍\p{Extended_Pictographic}️?)*)\s*/u;
+function splitEmoji(s) {
+  const m = String(s || '').trim().match(EMOJI_RE);
+  return m ? [m[1], String(s).trim().slice(m[0].length).trim()] : ['', String(s || '').trim()];
+}
+const splitBar = s => String(s || '').split('|').map(t => t.trim());
+const fmt = n => n.toLocaleString('uk-UA');
+
+/* ---------- Типи елементів ---------- */
+const TYPES = {
+  hero: {
+    label: 'Шапка уроку',
+    defaults: () => ({ lessonNumber: '', storyEmoji: '🏰', storyName: 'Академія пригод', title: '', subtitle: '', color: DEFAULT_COLOR }),
+    fields: [['lessonNumber', 'number', 'Номер уроку'], ['storyEmoji', 'emoji', 'Емодзі сюжету'], ['storyName', 'text', 'Назва сюжету'], ['title', 'text', 'Назва уроку'], ['subtitle', 'text', 'Підзаголовок (необов’язково)'], ['color', 'color', 'Колір уроку']],
+    render: d => {
+      const sub = flat(d.subtitle);
+      return `<div class="mk-hero" style="--c:${safeColor(d.color)}"><div class="mk-hero__in"><span class="mk-hero__pill">Урок ${rich(d.lessonNumber)}</span><span class="mk-hero__pill mk-hero__pill--s">${pair(emo(d.storyEmoji), rich(d.storyName))}</span><h1>${rich(d.title)}</h1>${sub ? `<div class="mk-hero__p">${rich(sub)}</div>` : ''}</div><div class="mk-hero__px"></div></div>`;
+    }
+  },
+  story: {
+    label: 'Легенда',
+    defaults: () => ({ emoji: '📜', tag: 'Легенда', paragraphs: [] }),
+    fields: [['emoji', 'emoji', 'Емодзі'], ['tag', 'text', 'Мітка'], ['paragraphs', 'lines', 'Абзаци (по рядку на абзац)']],
+    render: d => `<div class="mk-story"><span class="mk-story__tag">${pair(emo(d.emoji), rich(d.tag))}</span>${list(d.paragraphs).map(p => `<div class="mk-story__p">${rich(p)}</div>`).join('')}</div>`
+  },
+  goals: {
+    label: 'Після уроку ти зможеш',
+    defaults: () => ({ emoji: '🎯', title: 'Після уроку ти зможеш', items: [] }),
+    fields: [['emoji', 'emoji', 'Емодзі'], ['title', 'text', 'Заголовок'], ['items', 'lines', 'Пункти (по рядку на пункт)']],
+    render: d => `<div class="mk-goals"><div class="mk-goals__t">${pair(emo(d.emoji), rich(d.title))}</div><div class="mk-goals__list">${list(d.items).map(i => `<div class="mk-goals__li">${rich(i)}</div>`).join('')}</div></div>`
+  },
+  h: {
+    label: 'Заголовок блоку',
+    defaults: () => ({ emoji: '🎬', title: '', subtitle: '', color: null }),
+    fields: [['emoji', 'emoji', 'Емодзі'], ['title', 'text', 'Заголовок'], ['subtitle', 'text', 'Підзаголовок (необов’язково)'], ['color', 'color', 'Колір']],
+    render: (d, ctx) => {
+      const sub = flat(d.subtitle);
+      return `<div class="mk-h" style="--c:${safeColor(d.color || ctx.heroColor)}"><div class="mk-h__i">${emo(d.emoji)}</div><div><h2>${rich(d.title)}</h2>${sub ? `<div class="mk-h__s">${rich(sub)}</div>` : ''}</div></div>`;
+    }
+  },
+  sep: {
+    label: 'Розділювач «кубики»',
+    defaults: () => ({ colors: SEP_COLORS.slice() }),
+    fields: [['colors', 'sepColors', 'Кольори кубиків']],
+    render: d => `<div class="mk-sep">${SEP_COLORS.map((c, i) => `<span style="--b:${safeColor((d.colors || [])[i], c)}">&nbsp;</span>`).join('')}</div>`
+  },
+  strip: {
+    label: 'Розділювач «смуга землі»',
+    defaults: () => ({}),
+    fields: [],
+    render: () => `<div class="mk-strip"><span>&nbsp;</span></div>`
+  },
+  note: {
+    label: 'Підказка / Увага / Готово',
+    defaults: () => ({ variant: 'tip', emoji: '💡', title: 'Порада', text: '' }),
+    fields: [['variant', 'variant', 'Варіант'], ['emoji', 'emoji', 'Емодзі'], ['title', 'text', 'Заголовок'], ['text', 'area', 'Текст']],
+    render: d => {
+      const v = NOTE_VARIANTS[d.variant] ? d.variant : 'tip';
+      return `<div class="mk-note mk-note--${v}"><div class="mk-note__i">${emo(d.emoji)}</div><div><b>${rich(d.title)}</b><div class="mk-note__p">${rich(d.text)}</div></div></div>`;
+    }
+  },
+  quest: {
+    label: 'Місія',
+    defaults: () => ({ emoji: '🗝️', tag: 'Місія уроку', title: '', items: [] }),
+    fields: [['emoji', 'emoji', 'Емодзі'], ['tag', 'text', 'Мітка'], ['title', 'text', 'Назва місії'], ['items', 'lines', 'Кроки (по рядку на крок, номери ставить CSS)']],
+    render: d => `<div class="mk-quest"><div class="mk-quest__tag">${pair(emo(d.emoji), rich(d.tag))}</div><h2>${rich(d.title)}</h2><div class="mk-quest__list">${list(d.items).map(i => `<div class="mk-quest__li">${rich(i)}</div>`).join('')}</div></div>`
+  },
+  hw: {
+    label: 'Домашнє завдання на 3 рівні',
+    defaults: () => ({ emoji: '🏠', title: 'Домашнє завдання: обери свій рівень', cards: [{ name: '', text: '' }, { name: '', text: '' }, { name: '', text: '' }] }),
+    fields: [['emoji', 'emoji', 'Емодзі'], ['title', 'text', 'Заголовок'], ['cards', 'hw', 'Картки']],
+    render: d => `<div class="mk-hw"><div class="mk-hw__t">${pair(emo(d.emoji), rich(d.title))}</div><div class="mk-hw__g">${HW_STARS.map((s, i) => {
+      const c = (d.cards || [])[i] || {};
+      return `<div class="mk-hw__c"><div class="mk-hw__s">${s}</div><div class="mk-hw__n">${rich(c.name)}</div><div class="mk-hw__p">${rich(c.text)}</div></div>`;
+    }).join('')}</div></div>`
+  },
+  words: {
+    label: 'Трішки англійської',
+    defaults: () => ({ emoji: '🔤', title: 'Трішки англійської', words: [] }),
+    fields: [['emoji', 'emoji', 'Емодзі'], ['title', 'text', 'Заголовок'], ['words', 'words', 'Слова (1–8, по рядку: word — переклад)']],
+    render: d => `<div class="mk-words"><div class="mk-words__t">${pair(emo(d.emoji), rich(d.title))}</div><div class="mk-words__g">${(d.words || []).filter(w => flat(w.en) || flat(w.ua)).slice(0, 8).map(w => `<div class="mk-words__w"><div class="mk-words__en">${rich(w.en)}</div><div class="mk-words__ua">${rich(w.ua)}</div></div>`).join('')}</div></div>`
+  },
+  art: {
+    label: 'Артефакт уроку',
+    defaults: () => ({ emoji: '🎒', name: '', text: '' }),
+    fields: [['emoji', 'emoji', 'Емодзі'], ['name', 'text', 'Назва артефакту'], ['text', 'area', 'Текст']],
+    render: d => `<div class="mk-art"><div class="mk-art__i">${emo(d.emoji)}</div><div><div class="mk-art__k">🏆 Артефакт уроку</div><div class="mk-art__n">${rich(d.name)}</div><div class="mk-art__p">${rich(d.text)}</div></div></div>`
+  },
+  next: {
+    label: 'Наступний урок',
+    defaults: () => ({ emoji: '🔮', nextNumber: '', nextTitle: '', teaser: '' }),
+    fields: [['emoji', 'emoji', 'Емодзі'], ['nextNumber', 'number', 'Номер наступного уроку'], ['nextTitle', 'text', 'Назва наступного уроку'], ['teaser', 'area', 'Тизер']],
+    render: d => `<div class="mk-next"><div class="mk-next__i">${emo(d.emoji)}</div><div><div class="mk-next__k">Наступного разу</div><div class="mk-next__n">Урок ${rich(d.nextNumber)}. ${rich(d.nextTitle)}</div><div class="mk-next__p">${rich(d.teaser)}</div></div></div>`
+  }
+};
+const TYPE_ORDER = ['hero', 'story', 'goals', 'h', 'sep', 'strip', 'note', 'quest', 'hw', 'words', 'art', 'next'];
+
+/* ---------- Стан ---------- */
+let state = { source: '', elements: [], seq: 1 };
+const newEl = (type, data) => ({ id: 'e' + (state.seq++), type, data: Object.assign(TYPES[type].defaults(), data || {}) });
+const heroColor = () => { const h = state.elements.find(e => e.type === 'hero'); return safeColor(h && h.data.color); };
+const findEl = id => state.elements.find(e => e.id === id);
+
+function buildOutputs() {
+  const ctx = { heroColor: heroColor() };
+  return state.elements.map(el => ({ el, html: oneLine(TYPES[el.type].render(el.data, ctx)), css: CSS[el.type] }));
+}
+
+/* ---------- Парсер ---------- */
+const LABELS = {
+  'урок': 'hero:lessonNumber', 'сюжет': 'hero:story', 'назва': 'hero:title', 'підзаголовок': 'hero:subtitle',
+  'легенда': 'story', 'цілі': 'goals', 'заголовок': 'h', 'розділювач': 'sep', 'смуга': 'strip',
+  'порада': 'note:tip', 'увага': 'note:warn', 'перевір': 'note:ok', 'місія': 'quest', 'дз': 'hw',
+  'англійська': 'words', 'артефакт': 'art', 'наступний': 'next'
+};
+const NO_VALUE = new Set(['sep', 'strip']);
+const stripBullet = s => s.replace(/^[-•]\s+/, '').trim();
+
+function parseLesson(text) {
+  const blocks = [], unknown = [];
+  let cur = null;
+  for (const raw of String(text || '').replace(/\r/g, '').split('\n')) {
+    const line = raw.trim();
+    if (!line) continue;
+    const m = line.match(/^#([\p{L}\p{N}_-]+)\s*(:)?\s*(.*)$/u);
+    if (m) {
+      const key = LABELS[m[1].toLowerCase()];
+      if (key && (m[2] || NO_VALUE.has(key))) { cur = { key, value: m[3].trim(), lines: [] }; blocks.push(cur); continue; }
+      cur = null;
+      unknown.push(line);
+      continue;
+    }
+    if (cur) cur.lines.push(line); else unknown.push(line);
+  }
+
+  const out = [];
+  let hero = null;
+  const joinText = b => [b.value, ...b.lines].filter(Boolean).join(' ');
+  for (const b of blocks) {
+    const [kind, sub] = b.key.split(':');
+    if (kind === 'hero') {
+      if (!hero) { hero = newEl('hero', { storyName: '', storyEmoji: '' }); out.push(hero); }
+      const v = joinText(b);
+      if (sub === 'story') {
+        const [e, name] = splitEmoji(v);
+        const sec = SECTIONS.find(s => s.name.toLowerCase() === name.toLowerCase());
+        hero.data.storyName = name;
+        hero.data.storyEmoji = e || (sec ? sec.emoji : '🏰');
+        if (sec) hero.data.color = sec.color;
+      } else hero.data[sub] = v;
+    } else if (kind === 'story') {
+      out.push(newEl('story', { paragraphs: [b.value, ...b.lines].filter(Boolean) }));
+    } else if (kind === 'goals') {
+      out.push(newEl('goals', { items: [b.value, ...b.lines].filter(Boolean).map(stripBullet) }));
+    } else if (kind === 'h') {
+      const [e, rest] = splitEmoji(b.value);
+      const [title, ...s] = splitBar(rest);
+      out.push(newEl('h', Object.assign({ title, subtitle: s.join(' | ') }, e ? { emoji: e } : {})));
+      unknown.push(...b.lines);
+    } else if (NO_VALUE.has(kind)) {
+      out.push(newEl(kind));
+      if (b.value) unknown.push(b.value);
+      unknown.push(...b.lines);
+    } else if (kind === 'note') {
+      const v = NOTE_VARIANTS[sub];
+      out.push(newEl('note', { variant: sub, emoji: v.emoji, title: v.title, text: joinText(b) }));
+    } else if (kind === 'quest') {
+      out.push(newEl('quest', { title: b.value, items: b.lines.map(stripBullet) }));
+    } else if (kind === 'hw') {
+      const rows = [b.value, ...b.lines].filter(Boolean).map(stripBullet);
+      const cards = rows.slice(0, 3).map(r => { const [name, ...t] = splitBar(r); return { name, text: t.join(' | ') }; });
+      while (cards.length < 3) cards.push({ name: '', text: '' });
+      unknown.push(...rows.slice(3));
+      out.push(newEl('hw', { cards }));
+    } else if (kind === 'words') {
+      const rows = [b.value, ...b.lines].filter(Boolean).map(stripBullet);
+      out.push(newEl('words', { words: rows.slice(0, 8).map(parseWord) }));
+      unknown.push(...rows.slice(8));
+    } else if (kind === 'art') {
+      const [e, rest] = splitEmoji(b.value);
+      const [name, ...t] = splitBar(rest);
+      out.push(newEl('art', Object.assign({ name, text: [t.join(' | '), ...b.lines].filter(Boolean).join(' ') }, e ? { emoji: e } : {})));
+    } else if (kind === 'next') {
+      const [n, title, ...t] = splitBar(b.value);
+      out.push(newEl('next', { nextNumber: n || '', nextTitle: title || '', teaser: [t.join(' | '), ...b.lines].filter(Boolean).join(' ') }));
+    }
+  }
+  if (hero && !hero.data.storyEmoji) hero.data.storyEmoji = '🏰';
+  return { elements: out, unknown };
+}
+
+function parseWord(line) {
+  const m = String(line).match(/^(.*?)\s+[—–-]\s+(.*)$/);
+  return m ? { en: m[1].trim(), ua: m[2].trim() } : { en: String(line).trim(), ua: '' };
+}
+
+/* ---------- Картки ---------- */
+const cardsEl = $('#cards');
+
+function colorField(el, key, label) {
+  const val = el.data[key];
+  const eff = el.type === 'h' ? safeColor(val || heroColor()) : safeColor(val);
+  const inherit = el.type === 'h';
+  return `<div class="f"><span class="lbl">${esc(label)}</span><div class="swatches" data-colorfor="${key}">
+    ${SECTIONS.map(s => `<button type="button" class="sw" data-act="swatch" data-color="${s.color}" style="background:${s.color}" title="${s.n}. ${esc(s.name)}" aria-label="${s.n}. ${esc(s.name)} ${s.color}" aria-pressed="${!!val && val.toUpperCase() === s.color}"></button>`).join('')}
+    <input type="color" data-k="${key}" value="${eff.length === 7 ? eff : DEFAULT_COLOR}" aria-label="Свій колір">
+    ${inherit ? `<button type="button" class="btn btn-sm" data-act="inherit" aria-pressed="${!val}">Як у шапці</button><span class="inherit-note">${val ? 'Свій колір' : 'Успадковано від шапки'}</span>` : ''}
+  </div></div>`;
+}
+
+function fieldHTML(el, [key, kind, label]) {
+  const d = el.data;
+  const id = `${el.id}-${key}`;
+  switch (kind) {
+    case 'text': return `<label class="f"><span>${esc(label)}</span><input type="text" id="${id}" data-k="${key}" value="${esc(d[key])}"></label>`;
+    case 'number': return `<label class="f"><span>${esc(label)}</span><input type="text" inputmode="numeric" id="${id}" data-k="${key}" value="${esc(d[key])}"></label>`;
+    case 'area': return `<label class="f"><span>${esc(label)}</span><textarea id="${id}" data-k="${key}" rows="3">${esc(d[key])}</textarea></label>`;
+    case 'lines': return `<label class="f"><span>${esc(label)}</span><textarea id="${id}" data-k="${key}" data-kind="lines" rows="4">${esc((d[key] || []).join('\n'))}</textarea></label>`;
+    case 'words': return `<label class="f"><span>${esc(label)}</span><textarea id="${id}" data-k="${key}" data-kind="words" rows="4" placeholder="block — блок">${esc((d.words || []).map(w => w.ua ? `${w.en} — ${w.ua}` : w.en).join('\n'))}</textarea></label>`;
+    case 'emoji': return `<div class="f"><span class="lbl" id="${id}-l">${esc(label)}</span><button type="button" class="emo-btn" data-act="emoji" data-k="${key}" aria-labelledby="${id}-l" aria-haspopup="dialog" title="Змінити емодзі">${esc(d[key]) || '＋'}</button></div>`;
+    case 'color': return colorField(el, key, label);
+    case 'variant': return `<div class="f"><span class="lbl">${esc(label)}</span><div class="seg" role="radiogroup">${Object.entries(NOTE_VARIANTS).map(([v, o]) => `<label><input type="radio" name="${el.id}-variant" value="${v}" data-k="variant" ${d.variant === v ? 'checked' : ''}>${o.emoji} ${o.label}</label>`).join('')}</div></div>`;
+    case 'hw': return `<div class="f"><span class="lbl">${esc(label)}</span><div class="hw-cards">${HW_STARS.map((s, i) => {
+      const c = (d.cards || [])[i] || {};
+      return `<div class="hw-card"><div class="stars">${s} Рівень ${i + 1}</div><input type="text" data-k="cards.${i}.name" value="${esc(c.name)}" placeholder="Назва" aria-label="Рівень ${i + 1}: назва"><textarea data-k="cards.${i}.text" rows="2" placeholder="Текст завдання" aria-label="Рівень ${i + 1}: текст">${esc(c.text)}</textarea></div>`;
+    }).join('')}</div></div>`;
+    case 'sepColors': return `<div class="f"><span class="lbl">${esc(label)}</span><div class="sep-colors">${SEP_COLORS.map((c, i) => `<input type="color" data-k="colors.${i}" value="${safeColor((d.colors || [])[i], c)}" aria-label="Кубик ${i + 1}">`).join('')}<button type="button" class="btn btn-sm" data-act="sepReset">Стандартні</button></div></div>`;
+  }
+  return '';
+}
+
+function cardHTML(el, i, n) {
+  const t = TYPES[el.type];
+  const fields = t.fields;
+  // Емодзі ставимо поруч із першим текстовим полем, щоб картки були компактніші.
+  let body = '';
+  for (let k = 0; k < fields.length; k++) {
+    const f = fields[k], nx = fields[k + 1];
+    if (f[1] === 'emoji' && nx && (nx[1] === 'text' || nx[1] === 'number')) {
+      body += `<div class="f-inline">${fieldHTML(el, f)}${fieldHTML(el, nx)}</div>`; k++;
+    } else body += fieldHTML(el, f);
+  }
+  if (!fields.length) body = '<div class="muted small">Полів немає — елемент вставляється як є.</div>';
+  return `<article class="card" data-id="${el.id}" aria-label="${i + 1}. ${esc(t.label)}">
+    <div class="card-h"><span class="ttl"><span class="num">${i + 1}</span>${esc(t.label)}</span>
+      <button type="button" class="icon-btn" data-act="up" ${i === 0 ? 'disabled' : ''} aria-label="Вище" title="Вище">↑</button>
+      <button type="button" class="icon-btn" data-act="down" ${i === n - 1 ? 'disabled' : ''} aria-label="Нижче" title="Нижче">↓</button>
+      <button type="button" class="icon-btn" data-act="dup">Дублювати</button>
+      <button type="button" class="icon-btn danger" data-act="del">Видалити</button>
+    </div>
+    <div class="card-b">${body}</div>
+  </article>`;
+}
+
+function renderCards() {
+  const n = state.elements.length;
+  cardsEl.innerHTML = n ? state.elements.map((el, i) => cardHTML(el, i, n)).join('') : '<div class="empty-list">Поки що порожньо. Встав текст уроку й натисни «Розкласти по шаблону» або додай елемент вручну.</div>';
+  $('#listCount').textContent = n ? `${n} ${plural(n, 'елемент', 'елементи', 'елементів')}` : '';
+}
+const plural = (n, one, few, many) => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? one : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? few : many; };
+
+// Синхронізує пікери кольору без перемальовування карток (щоб не губився фокус).
+function syncColorUI() {
+  const hc = heroColor();
+  cardsEl.querySelectorAll('.card').forEach(card => {
+    const el = findEl(card.dataset.id);
+    if (!el || !('color' in el.data)) return;
+    const val = el.data.color;
+    const eff = el.type === 'h' ? safeColor(val || hc) : safeColor(val);
+    card.querySelectorAll('.sw').forEach(b => b.setAttribute('aria-pressed', String(!!val && val.toUpperCase() === b.dataset.color)));
+    const ci = card.querySelector('input[type=color][data-k=color]');
+    if (ci && document.activeElement !== ci) ci.value = eff.length === 7 ? eff : DEFAULT_COLOR;
+    const ib = card.querySelector('[data-act=inherit]');
+    if (ib) { ib.setAttribute('aria-pressed', String(!val)); ib.nextElementSibling.textContent = val ? 'Свій колір' : 'Успадковано від шапки'; }
+  });
+}
+
+function setPath(obj, path, value) {
+  const parts = path.split('.');
+  let o = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const p = parts[i];
+    if (o[p] == null) o[p] = /^\d+$/.test(parts[i + 1]) ? [] : {};
+    o = o[p];
+  }
+  o[parts[parts.length - 1]] = value;
+}
+
+cardsEl.addEventListener('input', e => {
+  const t = e.target, card = t.closest('.card');
+  if (!card || !t.dataset.k) return;
+  const el = findEl(card.dataset.id);
+  if (!el || t.type === 'radio') return;
+  let v = t.value;
+  if (t.dataset.kind === 'lines') v = v.split('\n');
+  else if (t.dataset.kind === 'words') v = v.split('\n').map(parseWord);
+  else if (t.type === 'color') v = v.toUpperCase();
+  setPath(el.data, t.dataset.k, v);
+  if (t.dataset.k === 'color') syncColorUI();
+  scheduleUpdate();
+});
+
+cardsEl.addEventListener('change', e => {
+  const t = e.target, card = t.closest('.card');
+  if (!card || t.type !== 'radio' || t.dataset.k !== 'variant') return;
+  const el = findEl(card.dataset.id);
+  const prev = NOTE_VARIANTS[el.data.variant] || NOTE_VARIANTS.tip, next = NOTE_VARIANTS[t.value];
+  // Емодзі й заголовок міняємо, лише якщо вони стандартні для попереднього варіанту.
+  if (!el.data.emoji || el.data.emoji === prev.emoji) el.data.emoji = next.emoji;
+  if (!flat(el.data.title) || el.data.title === prev.title) el.data.title = next.title;
+  el.data.variant = t.value;
+  card.querySelector('[data-act=emoji][data-k=emoji]').textContent = el.data.emoji;
+  card.querySelector('input[data-k=title]').value = el.data.title;
+  scheduleUpdate();
+});
+
+cardsEl.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const card = b.closest('.card');
+  const idx = state.elements.findIndex(x => x.id === card.dataset.id);
+  const el = state.elements[idx];
+  const act = b.dataset.act;
+  if (act === 'up' || act === 'down') {
+    const j = act === 'up' ? idx - 1 : idx + 1;
+    if (j < 0 || j >= state.elements.length) return;
+    [state.elements[idx], state.elements[j]] = [state.elements[j], state.elements[idx]];
+    structural(`[data-id="${el.id}"] [data-act="${act}"]`);
+  } else if (act === 'dup') {
+    const copy = newEl(el.type, clone(el.data));
+    state.elements.splice(idx + 1, 0, copy);
+    structural(`[data-id="${copy.id}"] .card-h [data-act="dup"]`);
+  } else if (act === 'del') {
+    if (!confirm(`Видалити елемент «${TYPES[el.type].label}»?`)) return;
+    state.elements.splice(idx, 1);
+    structural();
+  } else if (act === 'swatch') {
+    el.data.color = b.dataset.color;
+    syncColorUI(); scheduleUpdate();
+  } else if (act === 'inherit') {
+    el.data.color = null;
+    syncColorUI(); scheduleUpdate();
+  } else if (act === 'sepReset') {
+    el.data.colors = SEP_COLORS.slice();
+    card.querySelectorAll('input[type=color]').forEach((inp, i) => inp.value = SEP_COLORS[i]);
+    scheduleUpdate();
+  } else if (act === 'emoji') {
+    openEmoji(b, el, b.dataset.k);
+  }
+});
+
+function structural(focusSel) {
+  renderCards();
+  update();
+  if (focusSel) { const f = cardsEl.querySelector(focusSel); if (f && !f.disabled) f.focus(); }
+}
+
+/* ---------- Пікер емодзі ---------- */
+const pop = $('#emoPop');
+let popTarget = null;
+pop.innerHTML = EMOJI_GROUPS.map(([g, list]) => `<h3>${esc(g)}</h3><div class="emo-grid">${list.map(e => `<button type="button" data-e="${e}" aria-label="${e}">${e}</button>`).join('')}</div>`).join('') +
+  `<form class="emo-custom" id="emoForm"><input type="text" id="emoCustom" placeholder="Свій емодзі" aria-label="Свій емодзі" maxlength="16"><button type="submit" class="btn btn-sm btn-primary">OK</button></form>`;
+
+function openEmoji(btn, el, key) {
+  popTarget = { btn, id: el.id, key };
+  pop.hidden = false;
+  const r = btn.getBoundingClientRect();
+  const w = pop.offsetWidth;
+  const left = Math.max(12, Math.min(r.left + window.scrollX, window.scrollX + document.documentElement.clientWidth - w - 12));
+  pop.style.left = left + 'px';
+  pop.style.top = (r.bottom + window.scrollY + 6) + 'px';
+  $('#emoCustom').value = el.data[key] || '';
+  const cur = pop.querySelector(`[data-e="${CSS_escape(el.data[key] || '')}"]`);
+  (cur || pop.querySelector('[data-e]')).focus();
+}
+const CSS_escape = s => (window.CSS && window.CSS.escape) ? window.CSS.escape(s) : s.replace(/"/g, '\\"');
+function closeEmoji(refocus) {
+  if (pop.hidden) return;
+  pop.hidden = true;
+  if (refocus && popTarget && document.contains(popTarget.btn)) popTarget.btn.focus();
+  popTarget = null;
+}
+function pickEmoji(e) {
+  if (!popTarget) return;
+  const el = findEl(popTarget.id);
+  if (el) { el.data[popTarget.key] = e; popTarget.btn.textContent = e || '＋'; scheduleUpdate(); }
+  closeEmoji(true);
+}
+pop.addEventListener('click', e => { const b = e.target.closest('[data-e]'); if (b) pickEmoji(b.dataset.e); });
+$('#emoForm').addEventListener('submit', e => { e.preventDefault(); pickEmoji($('#emoCustom').value.trim()); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEmoji(true); });
+document.addEventListener('pointerdown', e => { if (!pop.hidden && !pop.contains(e.target) && !e.target.closest('[data-act=emoji]')) closeEmoji(false); });
+window.addEventListener('resize', () => closeEmoji(false));
+
+/* ---------- Перегляд ---------- */
+const frame = $('#preview');
+const pvWrap = $('#pvWrap');
+let frameReady = false;
+frame.srcdoc = '<!doctype html><html lang="uk"><head><meta charset="utf-8"><style>html,body{margin:0;background:#fff}#page{width:770px;padding:32px 0 36px;min-height:240px;display:flow-root}.gap{width:680px;margin:0 auto 24px;border:1.5px dashed #C9D2DC;border-radius:10px;padding:7px 12px;font:13px/1.4 system-ui,sans-serif;color:#8A96A3;text-align:center}.empty{width:680px;margin:60px auto;text-align:center;font:15px system-ui,sans-serif;color:#8A96A3}</style><style id="st"></style></head><body><div id="page"></div></body></html>';
+frame.addEventListener('load', () => {
+  frameReady = true;
+  const w = frame.contentWindow;
+  try { new w.ResizeObserver(fitFrame).observe(w.document.body); } catch (_) {}
+  try { w.document.fonts.ready.then(fitFrame); } catch (_) {}
+  update();
+});
+function fitFrame() {
+  if (!frameReady) return;
+  const doc = frame.contentDocument;
+  const h = doc.documentElement.scrollHeight;
+  frame.style.height = h + 'px';
+  const s = Math.min(1, pvWrap.clientWidth / 770);
+  frame.style.transform = s < 1 ? `scale(${s})` : '';
+  pvWrap.style.height = Math.ceil(h * s) + 'px';
+}
+new ResizeObserver(fitFrame).observe(pvWrap);
+
+function renderPreview(outs) {
+  if (!frameReady) return;
+  const doc = frame.contentDocument;
+  const used = [...new Set(outs.map(o => o.el.type))];
+  doc.getElementById('st').textContent = used.map(t => CSS[t]).join('\n');
+  doc.getElementById('page').innerHTML = outs.length
+    ? outs.map(o => o.html).join('<div class="gap">тут можна написати звичайний текст у білдері</div>')
+    : '<div class="empty">Тут з’явиться перегляд уроку</div>';
+  fitFrame();
+}
+
+/* ---------- Код і лічильники ---------- */
+const codeList = $('#codeList');
+const openCode = new Set();
+const lvl = (n, lim) => n > lim ? 'is-err' : n >= lim * 0.8 ? 'is-warn' : '';
+let lastOuts = [];
+
+function renderCode(outs) {
+  const total = outs.reduce((s, o) => s + o.html.length + o.css.length, 0);
+  const tl = lvl(total, TOTAL_LIMIT);
+  let h = outs.length ? `<div class="total"><b>Усього вставок: ${outs.length}</b><span class="cnt ${tl}">Разом ${fmt(total)} / ${fmt(TOTAL_LIMIT)}</span><span class="muted small">HTML + CSS усіх вставок</span></div>` : '';
+  if (tl === 'is-err') h += `<div class="msg-err" style="margin:-4px 0 12px">Сума HTML і CSS усіх вставок перевищує ${fmt(TOTAL_LIMIT)} символів — це ліміт одного елемента уроку в білдері. Розбий урок на кілька елементів LMS (наприклад, теорія й практика окремо) і вставляй частини в різні елементи.</div>`;
+  outs.forEach((o, i) => {
+    const hl = lvl(o.html.length, HTML_LIMIT);
+    h += `<section class="ins" data-id="${o.el.id}"><div class="ins-h"><b>Вставка ${i + 1}: ${esc(TYPES[o.el.type].label)}</b>
+      <span class="cnt ${hl}">HTML ${fmt(o.html.length)} / ${fmt(HTML_LIMIT)}</span><span class="cnt">CSS ${fmt(o.css.length)}</span></div>
+      <div class="row"><button type="button" class="btn btn-primary btn-sm" data-copy="html">Копіювати HTML</button><button type="button" class="btn btn-sm" data-copy="css">Копіювати CSS</button></div>
+      ${hl === 'is-err' ? `<div class="msg-err">HTML цієї вставки довший за ${fmt(HTML_LIMIT)} символів — білдер його не прийме. Скороти текст або розділи його на дві вставки одного типу.</div>` : ''}
+      <details ${openCode.has(o.el.id) ? 'open' : ''}><summary>Показати код</summary><div class="lbl">HTML</div><pre>${esc(o.html)}</pre><div class="lbl">CSS</div><pre>${esc(o.css)}</pre></details></section>`;
+  });
+  codeList.innerHTML = h;
+}
+codeList.addEventListener('toggle', e => {
+  const s = e.target.closest('.ins');
+  if (s) e.target.open ? openCode.add(s.dataset.id) : openCode.delete(s.dataset.id);
+}, true);
+codeList.addEventListener('click', e => {
+  const b = e.target.closest('[data-copy]');
+  if (!b) return;
+  const o = lastOuts.find(x => x.el.id === b.closest('.ins').dataset.id);
+  if (o) copyText(b.dataset.copy === 'html' ? o.html : o.css);
+});
+
+async function copyText(text) {
+  let ok = false;
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); ok = true; } } catch (_) {}
+  if (!ok) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+    document.body.appendChild(ta); ta.select();
+    try { ok = document.execCommand('copy'); } catch (_) {}
+    ta.remove();
+  }
+  toast(ok ? 'Скопійовано' : 'Не вдалося скопіювати — відкрий «Показати код» і скопіюй вручну');
+}
+let toastT;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+/* ---------- Оновлення і збереження ---------- */
+let updT;
+function scheduleUpdate() { clearTimeout(updT); updT = setTimeout(update, 150); }
+function update() {
+  clearTimeout(updT);
+  lastOuts = buildOutputs();
+  renderPreview(lastOuts);
+  renderCode(lastOuts);
+  save();
+}
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+}
+function normalize(raw) {
+  if (!raw || !Array.isArray(raw.elements)) throw new Error('Немає списку елементів');
+  const s = { source: typeof raw.source === 'string' ? raw.source : '', elements: [], seq: 1 };
+  for (const e of raw.elements) {
+    if (!e || !TYPES[e.type]) continue;
+    s.elements.push({ id: 'e' + (s.seq++), type: e.type, data: Object.assign(TYPES[e.type].defaults(), e.data && typeof e.data === 'object' ? e.data : {}) });
+  }
+  return s;
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state = normalize(JSON.parse(raw));
+  } catch (_) {}
+}
+function exportable() {
+  return { app: 'mk-lesson-generator', version: 1, source: state.source, elements: state.elements.map(e => ({ type: e.type, data: e.data })) };
+}
+
+/* ---------- Верхня панель і швидке заповнення ---------- */
+const src = $('#source');
+src.addEventListener('input', () => { state.source = src.value; save(); });
+$('#btnSample').addEventListener('click', () => {
+  if (src.value.trim() && src.value !== SAMPLE && !confirm('Замінити текст у полі прикладом?')) return;
+  src.value = state.source = SAMPLE; save(); src.focus();
+});
+$('#btnParse').addEventListener('click', () => {
+  const res = parseLesson(src.value);
+  if (!res.elements.length) {
+    $('#parseResult').innerHTML = `<div class="unrec"><b>Не знайдено жодної мітки.</b> Рядки мають починатися з <code>#назва:</code>, <code>#легенда:</code> тощо — див. довідку нижче.</div>`;
+    return;
+  }
+  if (state.elements.length && !confirm('Замінити поточні елементи уроку тими, що розпізнано з тексту?')) return;
+  state.elements = res.elements;
+  $('#parseResult').innerHTML = `<div class="parsed-ok">Розпізнано ${res.elements.length} ${plural(res.elements.length, 'елемент', 'елементи', 'елементів')}.</div>` +
+    (res.unknown.length ? `<div class="unrec"><b>Не розпізнано (${res.unknown.length}):</b><ol>${res.unknown.map(u => `<li>${esc(u)}</li>`).join('')}</ol></div>` : '');
+  structural();
+});
+
+const addSel = $('#addType');
+addSel.innerHTML = TYPE_ORDER.map(t => `<option value="${t}">${esc(TYPES[t].label)}</option>`).join('');
+$('#btnAdd').addEventListener('click', () => {
+  const el = newEl(addSel.value);
+  state.elements.push(el);
+  structural();
+  const c = cardsEl.querySelector(`[data-id="${el.id}"]`);
+  if (c) { c.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); const f = c.querySelector('input,textarea,button.emo-btn'); if (f) f.focus({ preventScroll: true }); }
+});
+
+$('#btnNew').addEventListener('click', () => {
+  if (!confirm('Почати новий урок? Поточні елементи й текст буде очищено (збережи експорт, якщо потрібно).')) return;
+  state = { source: '', elements: [], seq: 1 };
+  src.value = ''; $('#parseResult').innerHTML = ''; openCode.clear();
+  structural();
+});
+$('#btnExport').addEventListener('click', () => {
+  const hero = state.elements.find(e => e.type === 'hero');
+  const n = hero && flat(hero.data.lessonNumber).replace(/[^\p{L}\p{N}_-]+/gu, '');
+  const blob = new Blob([JSON.stringify(exportable(), null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = n ? `mk-lesson-${n}.json` : 'mk-lesson.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+$('#btnImport').addEventListener('click', () => $('#fileImport').click());
+$('#fileImport').addEventListener('change', e => {
+  const f = e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const s = normalize(JSON.parse(r.result));
+      if (state.elements.length && !confirm('Замінити поточний урок імпортованим?')) return;
+      state = s; src.value = s.source; $('#parseResult').innerHTML = ''; openCode.clear();
+      structural(); toast('Урок імпортовано');
+    } catch (err) { alert('Не вдалося прочитати файл: ' + err.message); }
+  };
+  r.readAsText(f);
+});
+
+/* ---------- Старт ---------- */
+load();
+src.value = state.source;
+renderCards();
+update();
+</script>
+</body>
+</html>
